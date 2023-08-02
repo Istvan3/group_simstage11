@@ -6,7 +6,7 @@ define laser ranger(
         samples 240
     )
 
-    color "blue"
+    color "red"
     size [ 0.06 0.06 0.06]
 
     block( points 4
