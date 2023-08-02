@@ -1,26 +1,24 @@
 #include "ros/ros.h"
 #include "sensor_msgs/LaserScan.h"
 #include "geometry_msgs/Twist.h"
+#include <random> // Include the random library
 
 double obstacle_distance;
-bool obstacle_detected = false;
 
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& msg){
-  // Find the minimum distance to the obstacle
   obstacle_distance = *std::min_element(msg->ranges.begin(), msg->ranges.end());
-  
-  // Check if any obstacle is too close (e.g., within 0.5 meters)
-  if (obstacle_distance < 0.5) {
-    obstacle_detected = true;
-  } else {
-    obstacle_detected = false;
-  }
+}
+
+double getRandomAngularVelocity() {
+    // Generate a random angular velocity between -1.0 and 1.0
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_real_distribution<> dis(-3.0, 3.0);
+    return dis(gen);
 }
 
 int main(int argc, char **argv){
-    
   ros::init(argc, argv, "our_reactnavig");
-  
   ros::NodeHandle n;
 
   // Publisher for /cmd_vel
@@ -30,24 +28,21 @@ int main(int argc, char **argv){
 
   ros::Rate loop_rate(10); // 10 Hz
 
-  // Initializations
+  // Initializations:
   geometry_msgs::Twist cmd_vel_msg;
-  cmd_vel_msg.linear.x = 0.5;   // Set initial linear velocity
-  cmd_vel_msg.angular.z = 0.0;  // Set initial angular velocity
 
   while (ros::ok()){
-    
-    if (obstacle_detected) {
-      // If an obstacle is detected, turn away from it
+    if (obstacle_distance < 0.45){
+      // When an obstacle is detected, stop and set random angular velocity
       cmd_vel_msg.linear.x = 0.0;
-      cmd_vel_msg.angular.z = 0.3; // Adjust the angular velocity as needed
+      cmd_vel_msg.angular.z = getRandomAngularVelocity(); // Set random angular velocity
     } else {
-      // If no obstacle is detected, move forward
-      cmd_vel_msg.linear.x = 0.5; // Adjust the linear velocity as needed
-      cmd_vel_msg.angular.z = 0.0;
+      // When no obstacle, move forward with a constant linear velocity
+      cmd_vel_msg.linear.x = 0.4;
+      cmd_vel_msg.angular.z = 0.0; // Set random angular velocity
     }
 
-    // Publish velocity commands
+    // Publish velocity commands:
     cmd_vel_pub.publish(cmd_vel_msg);
 
     ros::spinOnce();
@@ -56,5 +51,4 @@ int main(int argc, char **argv){
   }
 
   return 0;
-} 
-
+}
