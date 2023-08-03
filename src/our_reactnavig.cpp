@@ -32,7 +32,7 @@ int main(int argc, char **argv){
   geometry_msgs::Twist cmd_vel_msg;
 
   while (ros::ok()){
-    if (obstacle_distance < 0.45){
+    if (obstacle_distance < 0.8){
       // When an obstacle is detected, stop and set random angular velocity
       cmd_vel_msg.linear.x = 0.0;
       cmd_vel_msg.angular.z = getRandomAngularVelocity(); // Set random angular velocity
@@ -42,7 +42,7 @@ int main(int argc, char **argv){
       cmd_vel_msg.angular.z = 0.0; // Set random angular velocity
     }
 
-    // Publish velocity commands:
+   // Publish velocity commands:
     cmd_vel_pub.publish(cmd_vel_msg);
 
     ros::spinOnce();
