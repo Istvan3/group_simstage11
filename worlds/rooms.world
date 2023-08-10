@@ -22,4 +22,4 @@ bitmap "../maps/grid.pgm"
 )
 
 include "../robots/simple_robot.inc"
-simple_robot (pose [ 13.5 11 0.000 90.000 ] name "robot")
+simple_robot (pose [ 13.525 1.5 0.000 90.000 ] name "robot")
